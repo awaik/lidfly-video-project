@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "project_id": "CLIENT-ID-V001",
+  "versioning_policy": {
+    "scheme": "B1, B2, B3, ...",
+    "monotonic": true,
+    "reuse_forbidden": true,
+    "retention": "keep all generated, rejected, partial, superseded, intermediate and selected artifacts until explicit user-approved cleanup"
+  },
+  "variants": []
+}

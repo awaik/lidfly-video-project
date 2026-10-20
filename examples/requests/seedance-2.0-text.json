@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "shot_id": "S001",
+  "take_id": "T001",
+  "provider": "evolink",
+  "model": "seedance-2.0",
+  "mode": "text_to_video",
+  "prompt": "Vertical medium close-up. A courier in a yellow raincoat pauses under neon light in gentle rain and says exactly: \"Доставка уже здесь.\" Slow push-in, realistic reflections, end on a steady look into camera.",
+  "duration_seconds": 6,
+  "aspect_ratio": "9:16",
+  "resolution": "720p",
+  "generate_audio": true,
+  "references": [],
+  "options": {
+    "variant": "standard",
+    "content_filter": true
+  },
+  "narration": {
+    "text": "Доставка уже здесь.",
+    "language": "ru",
+    "voice": "neutral"
+  }
+}

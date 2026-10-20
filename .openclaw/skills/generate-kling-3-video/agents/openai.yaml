@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Kling 3 Video"
+  short_description: "Plan and run controlled Kling 3 video jobs"
+  default_prompt: "Use $generate-kling-3-video to prepare and execute this shot with Kling 3 through the configured API provider."

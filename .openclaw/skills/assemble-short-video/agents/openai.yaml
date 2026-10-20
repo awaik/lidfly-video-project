@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assemble Short Video"
+  short_description: "Assemble reviewed clips into a delivery master"
+  default_prompt: "Use $assemble-short-video to turn these reviewed clips, audio, captions, and brand assets into a reproducible vertical-video master."

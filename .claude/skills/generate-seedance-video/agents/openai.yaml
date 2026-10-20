@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Seedance Video"
+  short_description: "Plan and run multimodal Seedance video jobs"
+  default_prompt: "Use $generate-seedance-video to prepare this shot with Seedance 2.5 by default through the configured API provider, unless an explicit model or route constraint requires another supported Seedance version."

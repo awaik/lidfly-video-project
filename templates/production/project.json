@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "client_id": "client-id",
+  "project_id": "CLIENT-ID-V001",
+  "video_number": 1,
+  "title": "Видео №1",
+  "status": "planning",
+  "created_at": "2000-01-01T00:00:00.000Z",
+  "approval": {
+    "paid_generation": false,
+    "max_total_cost": null
+  },
+  "rights": {
+    "status": "pending",
+    "notes": []
+  },
+  "storage": {
+    "mode": "standard",
+    "project_root": "projects/client-id/V001",
+    "jobs_root": "artifacts/client-id/V001/jobs",
+    "audio_root": "artifacts/client-id/V001/audio",
+    "masters_root": "artifacts/client-id/V001/masters"
+  }
+}

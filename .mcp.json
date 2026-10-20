@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "openchatcut": {
+      "type": "http",
+      "url": "http://localhost:5199/api/external-mcp/mcp",
+      "headers": {
+        "Authorization": "Bearer ${OPENCHATCUT_MCP_TOKEN:-unset}",
+        "x-openchatcut-mcp-client": "claude-code",
+        "x-openchatcut-mcp-surface": "external"
+      }
+    }
+  }
+}

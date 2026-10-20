@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "shot_id": "S003",
+  "take_id": "T001",
+  "provider": "evolink",
+  "model": "kling-v3",
+  "mode": "text_to_video",
+  "prompt": "Vertical wide shot. A small delivery robot crosses a wet station platform while a train arrives behind it. Smooth lateral tracking, realistic wheel contact and splashes, blue-hour lighting.",
+  "duration_seconds": 5,
+  "aspect_ratio": "9:16",
+  "resolution": "720p",
+  "generate_audio": true,
+  "references": [],
+  "options": {
+    "negative_prompt": "text, watermark, warped wheels"
+  }
+}

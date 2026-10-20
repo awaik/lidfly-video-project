@@ -1,0 +1,18 @@
+Vibe Creating Prompt Skill — third-party notice
+================================================
+
+This skill is adapted from the independent, community-made bilingual port at:
+https://github.com/Alisa0808/vibe-creating-skill
+
+The Vibe Creating paradigm, the original Chinese prompt-skill draft, the
+four-layer prompt model, and the decision framework originate with ByteDance /
+Volcengine (火山引擎) and were published in the Vibe Creating Practice Handbook
+produced with the Seedance 2.0 video-generation model.
+
+Original sources:
+- Practice Handbook: https://bytedance.larkoffice.com/docx/FUHudm80VoGJRcxXykzcpNrQnj3
+- Prompt Skill draft: https://bytedance.larkoffice.com/docx/AVJddCKUmoj6j7x08jbcRBzon8b
+
+This project is not an official ByteDance / Volcengine product and is not
+affiliated with or endorsed by them. All trademarks, including Seedance,
+Volcengine, and 火山引擎, belong to their respective owners.

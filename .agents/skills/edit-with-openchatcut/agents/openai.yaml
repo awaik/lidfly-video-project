@@ -1,0 +1,4 @@
+interface:
+  display_name: "Edit With OpenChatCut"
+  short_description: "Edit a cut in OpenChatCut and adopt its master"
+  default_prompt: "Use $edit-with-openchatcut to open the reviewed takes in OpenChatCut, build the cut through an approved MCP edit session, render it, and adopt the export as a versioned project master."

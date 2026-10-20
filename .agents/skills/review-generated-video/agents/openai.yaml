@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Generated Video"
+  short_description: "Review generated clips before edit and delivery"
+  default_prompt: "Use $review-generated-video to score these generated clips, identify failures, and select the safest edit-ready takes."

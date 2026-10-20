@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "skills": {
+    "assemble-short-video": {
+      "SKILL.md": "74560f5f0df107fe20811c3b12185c8f87c86a0f4afd80a7bd967b49080cc846",
+      "agents/openai.yaml": "c646c77a1e52432cad1f3dea9c3528678966330a1a4ea1fbf5fff44e1e061b21",
+      "references/audio-production.md": "623bd42d2eb1904cf58044d66cbdf844d221e83ae4256379ff80aab77e3bea1b",
+      "references/edit-manifest.md": "78e51d9b1b1da75798e48004b19540c4d63073a61e1a7754f0b45c6faf00bed9",
+      "references/finishing-standard.md": "ec68837a85f5991da874677f7fbe7335bddc24055481dbed6f53a4722bf42fbb"
+    },
+    "develop-shot-plan": {
+      "SKILL.md": "fd42294c99c834f2298023187d21f4ba308120a31894d25ec85f71c83af91c79",
+      "agents/openai.yaml": "cc28eabd8488131df9e66dc9fdda13a70001e68fff3420f35aad673fba7ec6fc",
+      "references/runtime-constraints.md": "15db66c8dda3492091f0db698e3c477248c14050b5d50481eeaf7f3bd0d50c02",
+      "references/shotplan-contract.md": "0ef92e2f1a01670df6ed678415097c00118af994458022890ba05c92afb747d9",
+      "references/shotplan-review-rubric.md": "c9c654c76345bda8e2a3345f6be7c19e87760f0d3fe34144be9516452293848e",
+      "references/visual-storytelling.md": "e0f6da84b987d15893909c0e98e7bbf7d7799cb4141c418e9dbee0b622188331"
+    },
+    "edit-with-openchatcut": {
+      "SKILL.md": "1b23d4d2b84b8769bb64ade6f565da0c19b5ad5bf35e0d6b3cfb3c1b29a91e67",
+      "agents/openai.yaml": "6befc27ffa8b7866ed272c763d75180d1ec475994538d7dfba9df98daa2ab854",
+      "references/openchatcut-session.md": "b548225d217769eb23b90f4f32670fbfbb0825503bc670f07f65cec2e718f229"
+    },
+    "generate-browser-video": {
+      "SKILL.md": "8a6f06890c3a05a81a1a168498c34b9dc73453c338b4562096e3bc19d5acd751",
+      "agents/openai.yaml": "f53272df1bcb81d21c6aa231b113fd0be7262ad5b1847c96ac90dde2befc1945"
+    },
+    "generate-kling-3-video": {
+      "SKILL.md": "25dbc300342db7f6d94f66869732dd714f8fbac79224512c80bfa1656ac74ce1",
+      "agents/openai.yaml": "d2c679a01f50f70333cf2ab31ff4e9db84a3706571437a52dc3df3f95aa60810",
+      "references/provider-notes.md": "6c4427ae78180124d541a5400e742f7a6a92168658cd7f485560906728324d2c"
+    },
+    "generate-kling-o3-video": {
+      "SKILL.md": "b5cf198407cb6c115f49b4007e390f9085b840f34538f7752eecd22663bd933b",
+      "agents/openai.yaml": "3a386db4584f24a6963fd206be589c01b155a165492776b50bf44f23f2ff296b",
+      "references/provider-notes.md": "27accb7096e5b41f2231590298d6c6c29b66f2d25a7ef019826193daf41eb75a"
+    },
+    "generate-seedance-video": {
+      "SKILL.md": "2ebdbd77c12fe16e6f585324a0aee005c4db602a945db41dee2ebfb5c925e101",
+      "agents/openai.yaml": "86bcb61ba816a4e1e176ff25343efffafe6c1199da091c160359dc201d3fc2b1",
+      "references/byteplus-api.md": "4de1b6b8dd9f23e146b772111efc25ab5fa9c090e815fd9a7e0e99bc229931a5",
+      "references/evolink-api.md": "bcf6854ec85eac8c43fa555a3c4e6212254634e290c2132a9ff23de484cba20a"
+    },
+    "produce-short-video": {
+      "SKILL.md": "2344c30c5819976898c75ec5b7de16be8db159bad7a2063029dec902db16b807",
+      "agents/openai.yaml": "62a93b3028a7c4373b322221e7d47c47774d9dd113ea2c41bbb3578190fdbc73",
+      "references/creative-formats.md": "02fece81e7f1e5c045372cb78e45b6baf511957e320a8fae479bba3a2c8d91d8",
+      "references/job-recovery.md": "99772f307d2428390206dce84382c8f1b8628d8eaf5907296d7b4a36b3305f67",
+      "references/model-routing.md": "7aea1ca97bb07ec3a51bd6907e9f2df1cf0d5e3ffb866589530de15d1110963a",
+      "references/production-flow.md": "25007ff79d9b44b76e190e77331b308fb47add6479d022c1a2b5439745725be4",
+      "references/reference-assets.md": "e322a72d247f0f12495e9fd1da0dc6dfdfb070c751cb5543613a97405ec539f1",
+      "references/research-notes.md": "c449f6eab0244d6aa28ff72aace0b104957c734dcf79cffd53a320983fb3d363"
+    },
+    "review-generated-video": {
+      "SKILL.md": "b3fa17f12358b5ba48997c692969ebb3e5409d3af7a233409633793be77c7373",
+      "agents/openai.yaml": "04ed32c4b41cebce9913cb6454b7984c3daac37748105d8c49e33d40c44b8b6c",
+      "references/qa-rubric.md": "b72e1ea6aa260de8638253020bd06b3cb28f040e0e6e8bf8ef13b4575cb57bc6"
+    },
+    "vibe-creating-prompt": {
+      "LICENSE": "cc570644a02b227c3c339743259b6cbae60e1028ced12a15e4aae3ae50b7a2ba",
+      "NOTICE": "ec7f9246685edbf9864ba2799ea91069ceb7c9871ed9a5f3b528f017f48a26ae",
+      "SKILL.md": "e4803643a8c4f95be45602aece6730a6c973af5c23ed897d12813879378f0fd4",
+      "agents/openai.yaml": "2242dfc691a74edbbdad47d306d594e99461cde1de05de47c06418cfe39f2aca"
+    }
+  }
+}

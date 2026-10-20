@@ -1,0 +1,23 @@
+.DS_Store
+Thumbs.db
+
+.env
+.env.*
+!.env.example
+
+node_modules/
+
+# Local production artifacts, client projects, characters, and media libraries stay out of Git.
+/artifacts/
+/projects/
+/audio-library/
+/characters/
+
+# Logs in any directory.
+*.log
+*.logs
+.logs
+logs/
+
+# Pid and log of the OpenChatCut editor started by `openchatcut up`.
+/.openchatcut-editor/

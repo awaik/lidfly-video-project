@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce Short Video"
+  short_description: "Plan API-first Shorts and Reels production"
+  default_prompt: "Use $produce-short-video to turn this brief into an API-first production plan and route each shot to the right video model."

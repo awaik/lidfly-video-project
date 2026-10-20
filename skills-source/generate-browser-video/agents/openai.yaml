@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Browser Video"
+  short_description: "Generate Gemini clips in a browser and import takes"
+  default_prompt: "Use $generate-browser-video to generate the planned shots in the selected Gemini browser profile, download originals and import them for review and editing."

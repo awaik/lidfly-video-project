@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Shot Plan"
+  short_description: "Turn a script into a reviewed shot plan"
+  default_prompt: "Use $develop-shot-plan to turn this script into a beat-covered, continuity-locked shot plan, have it independently reviewed, and freeze it before any paid generation."

@@ -1,0 +1,25 @@
+{
+  "name": "lidfly-video-project",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "LidFly.ru (https://lidfly.ru)",
+  "homepage": "https://lidfly.ru",
+  "description": "API-first AI video skills and production workflows for Reels and YouTube Shorts by LidFly.ru",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run build:skills",
+    "build:skills": "node scripts/sync-skills.mjs",
+    "check:skills": "node scripts/sync-skills.mjs --check",
+    "test:skills": "node scripts/test-skills.mjs",
+    "test:contracts": "node --test tests/*.test.mjs",
+    "test": "npm run test:skills && npm run test:contracts",
+    "video": "node src/cli.mjs",
+    "editor": "node src/cli.mjs openchatcut up",
+    "editor:foreground": "node src/cli.mjs openchatcut start",
+    "editor:stop": "node src/cli.mjs openchatcut stop",
+    "editor:status": "node src/cli.mjs openchatcut status",
+    "editor:connect": "node src/cli.mjs openchatcut connect"
+  }
+}

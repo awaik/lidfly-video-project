@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vibe Creating Prompt"
+  short_description: "Turn rough video ideas into model-ready prompts"
+  default_prompt: "Use $vibe-creating-prompt to turn this idea into a generation-ready video prompt while preserving my hard constraints."

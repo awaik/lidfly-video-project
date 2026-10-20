@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Kling O3 Video"
+  short_description: "Plan multimodal Kling O3 or Omni video jobs"
+  default_prompt: "Use $generate-kling-o3-video to prepare this multimodal shot for the provider model mapped to Kling O3 or Video 3.0 Omni."

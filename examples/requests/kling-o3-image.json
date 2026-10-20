@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "shot_id": "S002",
+  "take_id": "T001",
+  "provider": "evolink",
+  "model": "kling-o3",
+  "mode": "image_to_video",
+  "prompt": "Medium close-up, slow controlled push-in. The approved character turns toward the window; rain reflections move across the jacket. End with the character still, looking outside.",
+  "duration_seconds": 5,
+  "aspect_ratio": "9:16",
+  "resolution": "720p",
+  "generate_audio": true,
+  "references": [
+    {
+      "asset_id": "character-start",
+      "role": "start_frame",
+      "url": "https://example.com/replace-with-accessible-start-frame.jpg",
+      "rights_status": "approved"
+    }
+  ],
+  "options": {
+    "watermark": false
+  }
+}
