@@ -17,9 +17,9 @@
       "references/visual-storytelling.md": "e0f6da84b987d15893909c0e98e7bbf7d7799cb4141c418e9dbee0b622188331"
     },
     "edit-with-openchatcut": {
-      "SKILL.md": "1b23d4d2b84b8769bb64ade6f565da0c19b5ad5bf35e0d6b3cfb3c1b29a91e67",
+      "SKILL.md": "86a66601466e7213d112008e703f0f343838ef07fdf992a8e6a152c7275e0e3a",
       "agents/openai.yaml": "6befc27ffa8b7866ed272c763d75180d1ec475994538d7dfba9df98daa2ab854",
-      "references/openchatcut-session.md": "b548225d217769eb23b90f4f32670fbfbb0825503bc670f07f65cec2e718f229"
+      "references/openchatcut-session.md": "f4683e2c1c7285dfb57ae90c737ee683ef0e948c1c9764e25d5bec7ab1613884"
     },
     "generate-browser-video": {
       "SKILL.md": "8a6f06890c3a05a81a1a168498c34b9dc73453c338b4562096e3bc19d5acd751",

@@ -73,7 +73,7 @@ function installedCheckout({ envLocal = "AGENT_IMPORT_ROOTS=\n", withProfile = t
   const profileRoot = join(HOME, ".openchatcut", "dev-profiles", PROFILE_ID);
   return memoryFs({
     files: {
-      [join(CHECKOUT, "package.json")]: JSON.stringify({ version: "0.2.14" }),
+      [join(CHECKOUT, "package.json")]: JSON.stringify({ version: "0.2.17" }),
       [join(CHECKOUT, "node_modules", ".bin", "vite")]: "#!/bin/sh",
       [join(CHECKOUT, ".npmrc")]: "allow-remote=all\n",
       [join(CHECKOUT, ".env.example")]: "LLM_PROVIDER=anthropic\nAGENT_IMPORT_ROOTS=\n",

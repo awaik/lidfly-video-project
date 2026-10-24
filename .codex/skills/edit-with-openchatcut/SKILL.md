@@ -101,13 +101,13 @@ Read [the session and hand-off reference](references/openchatcut-session.md) for
 arguments, upload commands and the adopted-master report.
 
 One rule shapes the whole sequence: **every change to the live project (an import finalizing,
-a draft being applied, a render being submitted) invalidates the MCP transport that was bound
-before it.** The editor answers `stale` ("re-initialize the MCP session"), closes the transport,
-and any draft it owned becomes orphaned. So real-project steps run through the CLI, which opens
-a fresh transport per step, and the agent's own MCP connection is used for the creative draft
-only. If your connection does go stale, reconnect the `openchatcut` server, then
-`list_edit_sessions` and `recover_edit_session` (`discard`) the orphaned draft before
-`begin_edit_session`.
+a draft being applied, a render being submitted) invalidates the revision binding of an active
+edit session.** The editor answers `stale` and marks the draft stale while keeping the MCP
+transport open. So real-project steps run through the CLI, which opens a fresh transport per
+step, and the agent's own MCP connection is used for the creative draft only. If your binding
+does go stale, call `target_project` with the same `projectId` on the same MCP transport (or
+reconnect the `openchatcut` server if the transport dropped), then `list_edit_sessions` and
+`recover_edit_session` (`discard`) the orphaned draft before `begin_edit_session`.
 
 ### 1. Bind to a project at the plan's shape
 
@@ -137,8 +137,9 @@ project's `brief/` assets with the rights they carry there. In the Electron buil
 ### 3. Draft the cut in an edit session
 
 1. `begin_edit_session` with `clientName` and the agreed `approvalMode`; keep `editSessionId`.
-   If it reports an active session, `list_edit_sessions` and discard only entries marked
-   `orphaned`; a session with `ownerOnline: true` belongs to a live client.
+   Pass `reuseExisting: true` to reuse your own active draft or adopt an unchanged orphan;
+   if reuse is rejected or you need a clean slate, call `list_edit_sessions` and discard only
+   entries marked `orphaned` (a session with `ownerOnline: true` belongs to another live client).
 2. `read_project` and `read_timeline` before the first mutation; re-read after any failure.
 3. Place pool assets with `edit_item` `adds` (`{ type: "video", assetId, track: "V1",
    fromFrame }`), then shape the cut with the draft-safe tools (`move_item`, `set_item_timing`,
@@ -203,9 +204,10 @@ and keep both records with the delivery.
 - `invalid OpenChatCut MCP token` / HTTP 403: `node src/cli.mjs openchatcut connect` (the dev
   profile token changed) or align `OPENCHATCUT_MCP_TOKEN` on both sides.
 - Tool missing or "browser required": open the project's `editorUrl` and refresh the tool list.
-- `stale` / "re-initialize the MCP session": the live project moved under the transport.
-  Reconnect the server, discard the orphaned draft, begin a new session; nothing partial was
-  applied.
+- `stale` / "Call target_project with the same project id to reconnect": the live project moved
+  under the transport. Call `target_project` with the same `projectId` on the same transport
+  (or reconnect the server), discard the orphaned draft, and begin a new session; nothing partial
+  was applied.
 - Session `stale`, `cancelled` or `failed`: it cannot resume; report it and begin a new session.
 - `openchatcut import` / `render` refuse a project without a connected tab: open `editorUrl`.
 

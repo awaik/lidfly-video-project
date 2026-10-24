@@ -33,7 +33,7 @@ export const OPENCHATCUT_NPMRC = `# Local install settings for this checkout (un
 # the lockfile pins two packages on registry.npmmirror.com, and the media
 # binaries below are downloaded by their install scripts.
 allow-remote=all
-allow-scripts=ffmpeg-static,@ffprobe-installer/darwin-arm64,esbuild,sharp,onnxruntime-node,electron,fsevents,protobufjs
+allow-scripts=ffmpeg-static,@ffprobe-installer/darwin-arm64,esbuild,sharp,onnxruntime-node,electron,fsevents,protobufjs,koffi,electron-winstaller
 `;
 
 const PROFILE_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;

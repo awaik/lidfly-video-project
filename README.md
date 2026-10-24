@@ -207,7 +207,7 @@ production-звук. Мастер версионируется и никогда
 локальный агентный видеоредактор с MCP-сервером (AGPL-3.0). Он живёт в отдельном checkout рядом с
 репозиторием (`../OpenChatCut`, путь переопределяется `OPENCHATCUT_DIR`) и требует Node 24, который
 CLI находит сам через nvm или `OPENCHATCUT_NODE`. В этот репозиторий он не входит: после clone его
-нужно установить отдельно. Интеграция проверена с версией 0.2.14 (коммит `19cba6e`, 2026-09-04).
+нужно установить отдельно. Интеграция проверена с версией 0.2.17 (коммит `7fa4b79`, 2026-10-21).
 
 ### Установка OpenChatCut
 
@@ -226,7 +226,7 @@ npm run editor                          # поднимает редактор; �
 ```bash
 git clone --depth 1 https://github.com/0xsline/OpenChatCut.git ../OpenChatCut
 cd ../OpenChatCut
-printf 'allow-remote=all\nallow-scripts=ffmpeg-static,@ffprobe-installer/darwin-arm64,esbuild,sharp,onnxruntime-node,electron,fsevents,protobufjs\n' > .npmrc
+printf 'allow-remote=all\nallow-scripts=ffmpeg-static,@ffprobe-installer/darwin-arm64,esbuild,sharp,onnxruntime-node,electron,fsevents,protobufjs,koffi,electron-winstaller\n' > .npmrc
 nvm use 24 && npm install
 cp -n .env.example .env.local           # плюс AGENT_IMPORT_ROOTS с artifacts/, projects/, audio-library/ этого репозитория
 ```

@@ -1,9 +1,9 @@
 # OpenChatCut session and hand-off reference
 
-Verified on 2026-09-05 against the OpenChatCut checkout at `../OpenChatCut` (v0.2.14, external
-skill baseline `2026-09-04.1`, MCP server version 1.0.0) with a live import → place → apply →
-render → adopt run. Tool schemas are served live by the MCP server; when a shape below disagrees
-with the live schema, the live schema wins and this file needs updating.
+Verified on 2026-10-24 against the OpenChatCut checkout at `../OpenChatCut` (v0.2.17, commit
+`7fa4b79`, external skill baseline `2026-09-04.1`, MCP server version 1.0.0) with a live import →
+place → apply → render → adopt run. Tool schemas are served live by the MCP server; when a shape
+below disagrees with the live schema, the live schema wins and this file needs updating.
 
 ## Editor lifecycle from the CLI
 
@@ -19,20 +19,23 @@ or another `OPENCHATCUT_MCP_TOKEN`, and a second server on the same port would f
 
 ## Transport staleness
 
-A transport binds to the project revision at `target_project`. Every editor call is checked
-against the current revision; after any live change (`finalize_uploaded_asset`,
-`review_edit_session` applying, `submit_render_job`) the next call answers
-`{"outcome":"stale","message":"Project … changed; re-initialize the MCP session."}`, the server
-closes the transport, and the active draft is marked stale. Consequences:
+A transport binds to the project revision at `target_project`. Every editor call carrying
+`editSessionId` is checked against the current revision; after any live change
+(`finalize_uploaded_asset`, `review_edit_session` applying, `submit_render_job`) the next
+session-bound call against the old revision answers `{"outcome":"stale","message":"…"}` and
+marks the active draft stale while keeping the MCP transport open. Consequences:
 
 - real-project steps belong in `node src/cli.mjs openchatcut import` / `render`, which open a
   fresh transport per step and discard their own zero-operation sessions afterwards;
-- an agent connection that went stale must reconnect (`/mcp` → reconnect `openchatcut` in
-  Claude Code) before any further call;
-- a draft whose owner disappeared shows up in `list_edit_sessions` as `orphaned: true` with
-  `recoveryActions: ["resume", "discard"]`; while the owner transport is alive it shows
-  `ownerOnline: true` and cannot be recovered by anyone else (the editor evicts idle
-  transports after 60 minutes; restarting `npm run editor` orphans them at once).
+- an agent connection whose binding went stale can re-bind in place by calling `target_project`
+  with the same `projectId` on the same MCP transport (which also orphans its stale owned
+  sessions), or reconnect (`/mcp` → reconnect `openchatcut` in Claude Code) if the transport
+  itself was closed;
+- a draft whose owner disappeared or re-bound shows up in `list_edit_sessions` as
+  `orphaned: true` with `recoveryActions: ["resume", "discard"]`; while the owner transport is
+  bound to the same revision it shows `ownerOnline: true` and cannot be recovered by anyone else
+  (the editor evicts idle transports after 60 minutes; restarting `npm run editor` orphans them
+  at once).
 
 Tool calls that carry `editSessionId` (all editor tools, real-project tools included) are
 the ones held to the bound revision; `list_projects`, `create_project`, `target_project`,
@@ -42,10 +45,11 @@ the ones held to the bound revision; `list_projects`, `create_project`, `target_
 
 - Endpoint: `http://localhost:5199/api/external-mcp/mcp` (Streamable HTTP). Every request
   carries `Authorization: Bearer <token>`; a missing or wrong token answers HTTP 403.
-- Without a connected editor tab the server exposes a **server-direct** tier (31 tools): session
-  controls, `read_project`, `read_timeline`, item/track edits, script and caption edits,
-  `import_timeline`. Upload, render, export, generation, visual inspection and manual approval
-  need a **browser-bound** project: open the `editorUrl`, then the editor registers its tools.
+- Without a connected editor tab the server exposes a **server-direct** tier (44 tools): session
+  controls, `read_project`, `read_timeline`, item/track/effect/library/watermark edits, script
+  and caption edits, local path imports, `import_timeline`. Upload, render, export, generation,
+  visual inspection and manual approval need a **browser-bound** project: open the `editorUrl`,
+  then the editor registers its tools.
 - `openchatcut_status` reports `connectedProjectIds`, `editors`, `toolCount` and
   `browserRequiredFor`. `list_projects` and `create_project` work without a browser.
 
@@ -54,7 +58,7 @@ the ones held to the bound revision; `list_projects`, `create_project`, `target_
 | Step | Tool | Notes |
 | --- | --- | --- |
 | bind | `target_project { projectId }` | returns `bindingMode` (`browser` or `offline`) and `editorUrl` |
-| open | `begin_edit_session { clientName, approvalMode }` | `manual` (default) or `auto`; keep `editSessionId` |
+| open | `begin_edit_session { clientName, approvalMode, reuseExisting? }` | `manual` (default) or `auto`; `reuseExisting: true` reuses an owned active draft or adopts an unchanged orphan; keep `editSessionId` |
 | read | `read_project`, `read_timeline` | pass `editSessionId`; draft edits are visible only inside the session |
 | edit | draft-safe tools | every call carries `editSessionId` |
 | finish | `review_edit_session { editSessionId, summary }` | manual: proposal card in the editor; auto: applied immediately |
@@ -240,6 +244,6 @@ audio stream. `warnings` (frozen stretches, cut-list oddities) need a human verd
 | connection refused / `fetch failed` | editor not running | `node src/cli.mjs openchatcut up`, then reconnect the MCP server |
 | HTTP 403 `invalid OpenChatCut MCP token` | token mismatch | `openchatcut connect`, or align `OPENCHATCUT_MCP_TOKEN` |
 | tool not exposed | no editor tab bound | open `editorUrl`, `openchatcut_status`, refresh tools |
-| `begin_edit_session` reports an active session | orphaned draft | `list_edit_sessions`, then `recover_edit_session` (`resume` or `discard`) |
-| session `stale` | live project changed under the draft | report it; new session |
+| `begin_edit_session` reports an active session | owned or orphaned draft | pass `reuseExisting: true`, or `list_edit_sessions` then `recover_edit_session` (`resume` or `discard`) |
+| session `stale` | live project changed under the draft | `target_project` with the same `projectId`, discard the orphaned draft, begin a new session |
 | upload 401 `invalid or expired upload handoff` | slot expired (5 min) or size/MIME mismatch | new `import_media` slot |
