@@ -92,7 +92,7 @@ node src/cli.mjs script review --project projects/<client>/V<NNN> --record <revi
 
 A record written against an older version of the plan is refused: the reviewer must have read what is actually on disk.
 
-For Gemini browser shots, set `route.model: "gemini-browser"` before freeze and use `$generate-browser-video` for UI capability checks. `browser_preflight_required` means the CLI cannot certify the website's current model, controls or quota. Record the observed settings in the brief for review. Compose browser attempts with `--shot <id> --take-id B1` (then B2, B3); these requests cannot be submitted to the API.
+For browser shots, set `route.model: "gemini-browser"` (Gemini, `$generate-browser-video`) or `"flow-browser"` (Google Flow, `$generate-flow-video`) before freeze and use that skill for UI capability checks. `browser_preflight_required` means the CLI cannot certify the website's current model, controls or quota. Record the observed settings in the brief for review. Compose browser attempts with `--shot <id> --take-id B1` (then B2, B3); these requests cannot be submitted to the API.
 
 ### 7. Freeze and compose
 

@@ -15,12 +15,12 @@ Use production bootstrap for an actual full-video workflow, including its planni
 
 - Treat `skills-source/` as canonical when editing this repository; never edit generated client copies.
 - Resolve or initialize the local production context before creative planning. Do not continue a full workflow without a validated `client_id`, `project_id`, and project-specific artifact roots.
-- Execute API video jobs through EVOLINK. For the user-selected browser route, use `$generate-browser-video` with Gemini; this is a separate route, not an API gateway substitution.
+- Execute API video jobs through EVOLINK. For a user-selected browser route, use `$generate-browser-video` with Gemini or `$generate-flow-video` with Google Flow; each is a separate route, not an API gateway substitution.
 - If reference availability has not already been resolved, ask the user for existing photos or footage before planning a shot that must preserve a specific person, product, or location. Reuse earlier answers; silence does not establish that no references exist.
 - Ingest every accepted reference through `node src/cli.mjs assets add` and clear all blockers from `node src/cli.mjs assets check` before a reference-driven generation. Never alter a user's original file to make it pass.
 - Freeze a reviewed shot plan before new production generation. `plan` and `submit` refuse without it and there is no override flag: `script check` → independent review → `script freeze` is the standard path. The only legacy exception is an existing named `approval.script_plan_waiver` covering the specific already-shot `shot_ids`; bootstrap does not create it. What the plan contains is the user's creative decision.
 - Use `$develop-shot-plan` to build, review and freeze that plan, and `$vibe-creating-prompt` to distill loose creative input before building model prompts.
-- For browser shots use `$generate-browser-video`; the model-specific API skills below apply only to API shots.
+- For browser shots use `$generate-browser-video` (Gemini) or `$generate-flow-video` (Flow); the model-specific API skills below apply only to API shots.
 - Use `$generate-kling-3-video`, `$generate-kling-o3-video`, or `$generate-seedance-video` for every model-specific request. Do not invent provider fields here.
 - Use `$review-generated-video` before accepting a take or sending clips to the edit.
 - Use `$assemble-short-video` for deterministic trimming, compositing, captions, exact graphics, sound, and delivery encoding.
@@ -154,7 +154,7 @@ Create the artifacts and states specified in [references/production-flow.md](ref
 
 ### 6. Preflight and execute
 
-For shots routed to `gemini-browser`, follow `$generate-browser-video`: compose a B-numbered browser request, check the selected profile and visible capabilities/quota, submit through the UI, download and run `browser-import`. API pricing, payload, submit and polling steps below apply only to API shots. Both routes retain the frozen plan, provenance, separate audio and take review.
+For shots routed to `gemini-browser` or `flow-browser`, follow `$generate-browser-video` or `$generate-flow-video`: compose a B-numbered browser request, check the selected profile and visible capabilities/quota, submit through the UI, download and run `browser-import`. API pricing, payload, submit and polling steps below apply only to API shots. Both routes retain the frozen plan, provenance, separate audio and take review.
 
 For each shot (reuse the frozen plan; an existing named legacy waiver replaces only the script-plan binding check for its listed shot_ids, never budget or reference checks):
 
@@ -198,7 +198,8 @@ Return:
 - estimated number of paid jobs and cost range when discoverable;
 - immutable request/job/output manifests;
 - QA decision per take and a final edit decision list;
-- delivery settings and disclosure note.
+- delivery settings and disclosure note;
+- refreshed project catalog (`node src/cli.mjs catalog` → `projects.md`); after the user approves a master, record it with `node src/cli.mjs catalog final --project <project> --file <master>`.
 
 When asked only to plan without a selected provider, stop after producing provider-preflight-ready draft manifests and mark exact `provider`, `model_id`, schema, price, and policy as unresolved gates. Call a manifest generation-ready only after those gates pass. When asked to execute, continue only within the approved provider and budget boundary.
 

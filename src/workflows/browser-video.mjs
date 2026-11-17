@@ -10,14 +10,7 @@ import { composeShotPrompt } from "../domain/shot-prompt.mjs";
 import { probeMedia } from "../media/ffmpeg.mjs";
 import { resolveProjectRegistry } from "./asset-registry.mjs";
 import { shotPlanStatus } from "./shot-plan.mjs";
-
-function geminiUrl(value) {
-  const url = new URL(requiredString(value, "receipt.result_url"));
-  if (url.protocol !== "https:" || url.hostname !== "gemini.google.com" || url.username || url.password) {
-    throw new Error("result_url must be a Gemini page, not a signed download URL");
-  }
-  return url.href;
-}
+import { browserResultUrl, isBrowserRoute } from "../domain/browser-routes.mjs";
 
 /** Local ingestion only. This command never submits a prompt or accepts a take. */
 export async function importBrowserTake({ projectRoot, workspaceRoot, requestPath, receiptPath, filePath }, tools = { probeMedia }) {
@@ -26,7 +19,7 @@ export async function importBrowserTake({ projectRoot, workspaceRoot, requestPat
   if (!status.gate_ready) throw new Error("Browser import requires an unchanged frozen shot plan and continuity");
   const request = await readJson(resolve(requestPath), "Browser request");
   const receipt = await readJson(resolve(receiptPath), "Browser receipt");
-  if (request.schema_version !== "browser-request/1" || request.provider !== "gemini-browser") {
+  if (request.schema_version !== "browser-request/1" || !isBrowserRoute(request.provider)) {
     throw new Error("Expected a composed browser-request/1 request");
   }
   const identity = request.metadata?.production;
@@ -39,9 +32,11 @@ export async function importBrowserTake({ projectRoot, workspaceRoot, requestPat
   const plan = normalizeShotPlan(await readJson(join(project.registryRoot, "brief/shotplan.json"), "Shot plan"));
   const continuity = normalizeContinuity(await readJson(join(project.registryRoot, "brief/continuity.json"), "Continuity"));
   const shot = plan.shots.find((item) => item.shot_id === shotId && item.source === "generated");
-  if (!shot || shot.route.model !== "gemini-browser") throw new Error("Shot is not routed to Gemini browser in the frozen plan");
+  if (!shot || shot.route.model !== request.provider) {
+    throw new Error(`Shot is not routed to ${request.provider} in the frozen plan`);
+  }
   if (request.prompt !== composeShotPrompt({ plan, continuity, shot }).prompt ||
-      request.model !== "gemini-browser" || request.mode !== shot.route.mode ||
+      request.model !== request.provider || request.mode !== shot.route.mode ||
       request.duration_seconds !== shot.duration_seconds || request.aspect_ratio !== plan.target.aspect_ratio ||
       request.resolution !== plan.target.resolution_default || request.generate_audio !== false) {
     throw new Error("Browser request differs from the frozen shot");
@@ -59,7 +54,7 @@ export async function importBrowserTake({ projectRoot, workspaceRoot, requestPat
   const requestHash = await hashFile(resolve(requestPath));
   if (receipt.request_sha256 !== requestHash) throw new Error("Receipt request hash mismatch");
   if (receipt.status !== "completed") throw new Error("Only a completed browser result can be imported");
-  const resultUrl = geminiUrl(receipt.result_url);
+  const resultUrl = browserResultUrl(request.provider, requiredString(receipt.result_url, "receipt.result_url"));
   for (const key of ["profile", "model_label", "submitted_at", "completed_at", "cost_note", "authorization_note", "settings_note"]) {
     requiredString(receipt[key], `receipt.${key}`);
   }
@@ -85,7 +80,7 @@ export async function importBrowserTake({ projectRoot, workspaceRoot, requestPat
   const manifest = {
     schema_version: "browser-take/1", status: "review_required", route: "browser",
     shot_id: shotId, take_id: request.take_id, metadata: request.metadata,
-    provider: "gemini-browser", model_label: receipt.model_label, result_url: resultUrl,
+    provider: request.provider, model_label: receipt.model_label, result_url: resultUrl,
     request_sha256: requestHash, receipt_sha256: await hashFile(join(directory, "receipt.json")),
     source_path: source, source_sha256: sourceHash, output, measured,
     imported_at: new Date().toISOString(),

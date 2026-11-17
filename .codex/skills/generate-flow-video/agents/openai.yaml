@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Flow Video"
+  short_description: "Generate Google Flow clips in a browser and import takes"
+  default_prompt: "Use $generate-flow-video to generate the planned shots in the selected Google Flow project, download originals and import them for review and editing."

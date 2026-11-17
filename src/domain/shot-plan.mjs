@@ -15,9 +15,10 @@ import {
   DEFAULT_VIDEO_MODEL,
   isAdaptiveOnlyMode,
 } from "./video-request.mjs";
+import { browserRouteModes } from "./browser-routes.mjs";
 
-// Planning route only; never an API model identifier. Capabilities are checked in the UI.
-const PLAN_MODEL_MODES = { ...MODEL_MODES, "gemini-browser": ["text_to_video", "image_to_video"] };
+// Browser routes are planning routes only; never API model identifiers. Capabilities are checked in the UI.
+const PLAN_MODEL_MODES = { ...MODEL_MODES, ...browserRouteModes() };
 
 export const SHOT_PLAN_SCHEMA_VERSION = 1;
 export const PLAN_STATUSES = Object.freeze(["draft", "reviewed", "frozen"]);

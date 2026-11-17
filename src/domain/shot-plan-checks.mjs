@@ -1,6 +1,7 @@
 import { buildEvolinkPayload, estimateJobCost } from "../providers/evolink/model-catalog.mjs";
 import { parseAspectRatio } from "./aspect-ratio.mjs";
 import { protagonistOf } from "./continuity.mjs";
+import { BROWSER_ROUTES, browserUiMismatches, isBrowserRoute } from "./browser-routes.mjs";
 import { aspectRatioForShot, CLOSE_SHOT_SIZES, maxEventsForDuration } from "./shot-plan.mjs";
 import { composeShotPrompt } from "./shot-prompt.mjs";
 import {
@@ -390,10 +391,21 @@ function checkDurationAndRoute(plan, continuity, findings) {
       );
     }
 
-    if (shot.route.model === "gemini-browser") {
+    if (isBrowserRoute(shot.route.model)) {
       findings.push(finding("warning", "browser_preflight_required",
-        `${shot.shot_id}: verify model label, references, duration, ratio, resolution and credit allowance in Gemini UI before submission; API pricing does not apply`,
+        `${shot.shot_id}: verify model label, references, duration, ratio, resolution and credit allowance in ${BROWSER_ROUTES[shot.route.model].service} UI before submission; API pricing does not apply`,
         { shot_id: shot.shot_id }));
+      const route = BROWSER_ROUTES[shot.route.model];
+      const issues = browserUiMismatches(shot.route.model, {
+        aspect_ratio: aspectRatioForShot(plan.target, shot.route),
+        resolution: plan.target.resolution_default,
+        duration_seconds: shot.duration_seconds,
+      });
+      if (issues.length) {
+        findings.push(finding("warning", "browser_ui_mismatch",
+          `${shot.shot_id}: ${issues.join("; ")} — as observed in ${route.service} (${route.observed_ui.model_label}, ${route.observed_ui.observed_at}); recheck the UI or change the plan before freeze`,
+          { shot_id: shot.shot_id }));
+      }
       continue;
     }
 
@@ -469,7 +481,7 @@ function deliveryRoutes(plan) {
 
 function checkAspectRatio(plan, findings) {
   for (const { shot_id: shotId, route } of deliveryRoutes(plan)) {
-    if (route.model === "gemini-browser") continue;
+    if (isBrowserRoute(route.model)) continue;
     const { choices } = aspectRatioChoicesFor(route.model, route.mode);
     const requested = aspectRatioForShot(plan.target, route);
     const label = shotId ?? "target";
@@ -524,7 +536,7 @@ function checkResolutionCeiling(plan, findings) {
   const resolution = plan.target.resolution_default;
   const models = [...new Set(deliveryRoutes(plan).map(({ route }) => route.model))].sort();
   for (const model of models) {
-    if (model === "gemini-browser") continue;
+    if (isBrowserRoute(model)) continue;
     const choices = resolutionChoicesFor(model);
     const ceiling = choices[choices.length - 1];
     if (ceiling !== resolution) continue;

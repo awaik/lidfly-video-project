@@ -9,7 +9,7 @@
       "references/finishing-standard.md": "ec68837a85f5991da874677f7fbe7335bddc24055481dbed6f53a4722bf42fbb"
     },
     "develop-shot-plan": {
-      "SKILL.md": "fd42294c99c834f2298023187d21f4ba308120a31894d25ec85f71c83af91c79",
+      "SKILL.md": "7ab7975ad44ac0c0f19de180a9f7584374f879354f3ae8e2449091c1522c9fc1",
       "agents/openai.yaml": "cc28eabd8488131df9e66dc9fdda13a70001e68fff3420f35aad673fba7ec6fc",
       "references/runtime-constraints.md": "15db66c8dda3492091f0db698e3c477248c14050b5d50481eeaf7f3bd0d50c02",
       "references/shotplan-contract.md": "0ef92e2f1a01670df6ed678415097c00118af994458022890ba05c92afb747d9",
@@ -24,6 +24,10 @@
     "generate-browser-video": {
       "SKILL.md": "8a6f06890c3a05a81a1a168498c34b9dc73453c338b4562096e3bc19d5acd751",
       "agents/openai.yaml": "f53272df1bcb81d21c6aa231b113fd0be7262ad5b1847c96ac90dde2befc1945"
+    },
+    "generate-flow-video": {
+      "SKILL.md": "c2cf9a9283ff2eee3588bba06646e5c6d690824f3b293eee62e6d8ce0590d75f",
+      "agents/openai.yaml": "a83ae288f84d216cd2dfa99e1a1efa6b8e67c6f259310270679ff61271106667"
     },
     "generate-kling-3-video": {
       "SKILL.md": "25dbc300342db7f6d94f66869732dd714f8fbac79224512c80bfa1656ac74ce1",
@@ -42,7 +46,7 @@
       "references/evolink-api.md": "bcf6854ec85eac8c43fa555a3c4e6212254634e290c2132a9ff23de484cba20a"
     },
     "produce-short-video": {
-      "SKILL.md": "2344c30c5819976898c75ec5b7de16be8db159bad7a2063029dec902db16b807",
+      "SKILL.md": "df09b6fcaef7d8c7a4a1ec5711917afb2c932f7ec960cb48ff3b651c9196631a",
       "agents/openai.yaml": "62a93b3028a7c4373b322221e7d47c47774d9dd113ea2c41bbb3578190fdbc73",
       "references/creative-formats.md": "02fece81e7f1e5c045372cb78e45b6baf511957e320a8fae479bba3a2c8d91d8",
       "references/job-recovery.md": "99772f307d2428390206dce84382c8f1b8628d8eaf5907296d7b4a36b3305f67",

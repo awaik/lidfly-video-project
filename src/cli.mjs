@@ -14,6 +14,7 @@ import {
   listReferenceAssets,
 } from "./workflows/asset-registry.mjs";
 import { importBrowserTake } from "./workflows/browser-video.mjs";
+import { buildCatalog, markFinalMaster } from "./workflows/catalog.mjs";
 import { adoptExternalMaster } from "./workflows/adopt-master.mjs";
 import { assembleMaster } from "./workflows/assembly.mjs";
 import { runDoctor } from "./workflows/doctor.mjs";
@@ -51,7 +52,7 @@ import {
   waitForVideoJob,
 } from "./workflows/video-job.mjs";
 
-const SUBCOMMAND_COMMANDS = new Set(["assets", "script", "openchatcut"]);
+const SUBCOMMAND_COMMANDS = new Set(["assets", "script", "openchatcut", "catalog"]);
 
 function parseArgs(argv) {
   const [command = "help", ...rest] = argv;
@@ -146,6 +147,9 @@ Commands:
                [--require-review]
   browser-import --project <path> --request <browser-request.json>
                  --receipt <receipt.json> --file <downloaded.mp4>
+  catalog       [--workspace-root <path>]   (пересобирает projects.md в корне)
+  catalog final --project <projects/<client>/VNNN> --file <masters/.../*-master-vN.mp4>
+               [--note <text>] [--workspace-root <path>]
   adopt-master --project <projects/<client>/VNNN> --variant <id>
                (--file <exported.mp4> | --url <http://localhost:5199/media/uploads/...>)
                [--timeline <read_timeline.json>] [--renderer openchatcut]
@@ -435,6 +439,20 @@ async function main() {
 
   if (command === "assets") {
     await assetsCommand(subcommand, options);
+    return;
+  }
+  if (command === "catalog") {
+    if (subcommand === null) {
+      output(await buildCatalog({ workspaceRoot: options.workspace_root }));
+    } else if (subcommand === "final") {
+      output(await markFinalMaster({
+        projectRoot: requireOption(options, "project"), workspaceRoot: options.workspace_root,
+        filePath: requireOption(options, "file"),
+        ...(options.note && options.note !== true ? { note: String(options.note) } : {}),
+      }));
+    } else {
+      throw new TypeError(`Unknown catalog subcommand: ${subcommand}`);
+    }
     return;
   }
   if (command === "browser-import") {

@@ -14,13 +14,17 @@
 2. **Через сайт Google Gemini в браузере (`gemini-browser`):**
    - Видео генерируется бесплатно/по подписке прямо на сайте `https://gemini.google.com/videos` в открытом профиле Chrome (агент сам вводит промпты, прикладывает референсы и скачивает оригинал через Chrome DevTools MCP / Puppeteer).
    - Скачанный MP4 принимается в проект командой `node src/cli.mjs browser-import` с проверкой хешей и параметров кадра.
-3. **Озвучка — всегда отдельно от видео:**
+3. **Через сайт Google Flow в браузере (`flow-browser`):**
+   - Видео генерируется в проекте `https://flow.google.com/project/<id>` за кредиты Flow; модель выбирается в интерфейсе (например, **Omni 1.2**), её видимое название записывается в receipt.
+   - Приём оригинала — тот же `node src/cli.mjs browser-import`, порядок работы — скилл `$generate-flow-video`.
+4. **Озвучка — всегда отдельно от видео:**
    - Нативная звуковая дорожка видеомоделей в финальный монтаж не идёт.
    - Голос синтезируется отдельно через API OpenRouter (модель **`google/gemini-3.1-flash-tts-preview`**, голос `Leda`, скрипт `scripts/tts-openrouter.mjs`, ключ `OPENROUTER_API_KEY`) либо через Komend TTS (`TTS_KOMEND_AUTH_TOKEN`).
 
 ### Как поставить задачу (для человека)
 
 - **Снять через браузер Gemini:** напишите агенту *«делаем ролик через браузер Gemini»* (или *«через сайт Gemini»*).
+- **Снять через Google Flow:** напишите *«делаем через Flow, модель Omni 1.2»* и дайте ссылку на проект Flow.
 - **Снять через API:** напишите *«делаем через API»* (или укажите модель: *«через Seedance 2.5»*, *«через Kling O3»*). Если маршрут не указан, агент по умолчанию выберет API EVOLINK (`seedance-2.5`).
 - **Скомбинировать:** можно попросить *«хук и кульминацию сними в Seedance 2.5, а остальные планы — через браузер Gemini»*.
 
@@ -29,11 +33,12 @@
 1. **Инициализация и план:** любой полный ролик начинается со скилла `$produce-short-video` (`node scripts/init-production.mjs`) и построения шот-плана по `$develop-shot-plan` (`script init` → `script check` → независимое `script review` → `script freeze`).
 2. **Выбор маршрута в `brief/shotplan.json` (до `script freeze`):**
    - если выбран **сайт Gemini**, в `target.model_default` и/или в `shot.route.model` записывается `"gemini-browser"`;
+   - если выбран **сайт Flow**, записывается `"flow-browser"` (модель Flow, например Omni 1.2, фиксируется в brief и receipt);
    - если выбран **API EVOLINK**, в `shot.route.model` записывается `"seedance-2.5"`, `"seedance-2.0"`, `"kling-o3"` или `"kling-v3"`.
 3. **Сборка запросов (`node src/cli.mjs script compose`):**
-   - для шотов с `"gemini-browser"` CLI создаёт `requests/S001-B1.json` (`schema_version: "browser-request/1"`). Агент выполняет их по скиллу `$generate-browser-video` в браузере и импортирует через `browser-import` (отправить такой файл в платный API невозможно — валидатор его отклонит);
+   - для шотов с `"gemini-browser"` или `"flow-browser"` CLI создаёт `requests/S001-B1.json` (`schema_version: "browser-request/1"`). Агент выполняет их по скиллу `$generate-browser-video` (Gemini) или `$generate-flow-video` (Flow) в браузере и импортирует через `browser-import` (отправить такой файл в платный API невозможно — валидатор его отклонит);
    - для API-шотов CLI создаёт `requests/S001-T001.json` (`schema_version: 1`, `provider: "evolink"`). Агент выполняет их по скиллам `$generate-seedance-video`, `$generate-kling-3-video` или `$generate-kling-o3-video` через команды `plan` → `submit --execute` → `wait`.
-4. **Проверка и монтаж (единые для обоих маршрутов):** каждый дубль проходит `$review-generated-video`, после чего собирается в мастер через `$assemble-short-video` (`assemble --require-review`) или интерактивный редактор `$edit-with-openchatcut` (`adopt-master`).
+4. **Проверка и монтаж (единые для всех маршрутов):** каждый дубль проходит `$review-generated-video`, после чего собирается в мастер через `$assemble-short-video` (`assemble --require-review`) или интерактивный редактор `$edit-with-openchatcut` (`adopt-master`).
 
 
 ## Первые модели
@@ -319,13 +324,32 @@ node src/cli.mjs adopt-master --project projects/<client>/VNNN --variant E002 \
 - `src/media/` — тонкие обёртки над ffmpeg/ffprobe без доменной логики;
 - `src/providers/evolink/` — транспорт, явный model allowlist и раздельные payload-контракты;
 - `src/providers/komend/` — TTS client и распознавание речи для проверки реплик;
-- `src/workflows/` — immutable job journal, submit/poll/download, бюджетный гейт, сборка мастера;
+- `src/workflows/` — immutable job journal, submit/poll/download, бюджетный гейт, сборка мастера, каталог проектов;
 - `tests/` — только mocked contract tests, без платных вызовов;
 - `skills-source/` — канонические skills.
 
 ## Локальные production-данные
 
 Полный workflow создаёт отдельный контекст для каждого клиента и номера видео. Профиль клиента и его production-проекты хранятся вместе в `projects/<client_id>/`, а результаты — в `artifacts/`; оба корня являются локальными и исключены из Git. Это защищает клиентские материалы от случайного коммита, но означает, что новый clone начинает с пустого локального реестра.
+
+### Каталог проектов: `projects.md`
+
+Где что лежит и какой мастер итоговый, видно в файле `projects.md` в корне репозитория. Его собирает команда
+
+```bash
+node src/cli.mjs catalog
+```
+
+из папок `projects/` и `artifacts/`: сводная таблица всех роликов со статусом и ссылкой на мастер, затем по каждому проекту — итоговый мастер с длительностью и размером кадра, все варианты монтажа с версиями, сценарий, шот-план и папки. Файл генерируется, вручную его не правят; в Git он не попадает.
+
+Мастером считается файл `<вариант>-master-vN.mp4` вне `_intermediates/`. Какой из них итоговый, решает пользователь; агент записывает решение командой
+
+```bash
+node src/cli.mjs catalog final --project projects/<client>/VNNN \
+  --file artifacts/<client>/VNNN/masters/<вариант>/<вариант>-master-vN.mp4 [--note "для клиента"]
+```
+
+Она создаёт новую запись `projects/<client>/VNNN/delivery/final-master-B<n>.json` (путь, sha256, длительность, кадр), прежние записи сохраняются, действует последняя, и пересобирает каталог. Если файл мастера потом изменится, каталог покажет предупреждение. Без отметки показан последний по времени мастер со статусом «собран, итог не отмечен».
 
 Резервное копирование этих каталогов нужно организовать вне Git. Не применяйте к ним `git clean` или автоматическую очистку: неудачные и устаревшие варианты, provider outputs и промежуточные артефакты сохраняются до явно подтверждённого удаления.
 
@@ -365,6 +389,14 @@ node src/cli.mjs browser-import --project projects/<client>/VNNN \
 запросы и не принимает дубль автоматически: далее обязательны QA и `assemble --require-review`.
 Нативная звуковая дорожка сохраняется в оригинале, но исключается из монтажа.
 Расходы и лимиты браузера записываются отдельно; команда `budget` считает API-задачи.
+
+## Третий маршрут: Google Flow в браузере
+
+Генерация через https://flow.google.com/ (модель выбирается в интерфейсе Flow, например Omni 1.2)
+описана в [generate-flow-video](skills-source/generate-flow-video/SKILL.md). Перед freeze задайте шоту
+`route.model: "flow-browser"`. Запросы, receipt и `browser-import` те же, что у Gemini;
+импорт дополнительно проверяет, что маршрут запроса совпадает с замороженным шотом и что
+`result_url` ведёт на страницу `flow.google.com`. Кредиты Flow записываются в receipt, `budget` их не считает.
 
 ## Лицензия
 

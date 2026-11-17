@@ -13,7 +13,7 @@ import { hashFile } from '../src/core/hashing.mjs';
 import { shotPlanFindings } from '../src/domain/shot-plan-checks.mjs';
 
 const json = (path, data) => writeFile(path, JSON.stringify(data));
-async function fixture() {
+async function fixture(route = 'gemini-browser', resultUrl = 'https://gemini.google.com/app/test') {
   const workspaceRoot = await realpath(await mkdtemp(join(tmpdir(), 'browser-video-')));
   const projectRoot = join(workspaceRoot, 'projects/demo/V001');
   await mkdir(join(projectRoot, 'brief'), { recursive: true });
@@ -26,11 +26,11 @@ async function fixture() {
   const continuity = normalizeContinuity({ project_id: manifest.project_id });
   const plan = normalizeShotPlan({ project_id: manifest.project_id,
     source_script: { path: 'brief/source.md', sha256: 'fixture' },
-    target: { duration_seconds_total: 4, aspect_ratio: '16:9', model_default: 'gemini-browser' },
+    target: { duration_seconds_total: 4, aspect_ratio: '16:9', model_default: route },
     beats: [{ beat_id: 'B01', label: 'test', importance: 'required' }],
     shots: [{ shot_id: 'S001', beat_ids: ['B01'], edit_purpose: 'test', duration_seconds: 4,
       shot_size: 'wide', subject: [], events: [{ event_id: 'E1', text: 'Water flows over stones' }],
-      route: { model: 'gemini-browser', mode: 'text_to_video' } }],
+      route: { model: route, mode: 'text_to_video' } }],
   });
   const frozen = { ...plan, status: 'frozen', plan_hash: shotPlanHash(plan), continuity_hash: continuityHash(continuity) };
   await json(join(projectRoot, 'brief/shotplan.json'), frozen);
@@ -39,7 +39,7 @@ async function fixture() {
   const requestPath = join(projectRoot, 'requests/S001-B1.json');
   const receiptPath = join(projectRoot, 'requests/S001-B1-completed.json');
   const receipt = { status: 'completed', request_sha256: await hashFile(requestPath), profile: 'test',
-    model_label: 'not_exposed', result_url: 'https://gemini.google.com/app/test', submitted_at: '2026-10-18T00:00:00Z',
+    model_label: 'not_exposed', result_url: resultUrl, submitted_at: '2026-10-18T00:00:00Z',
     completed_at: '2026-10-18T00:01:00Z', cost_note: 'unknown', authorization_note: 'fixture only', settings_note: '16:9' };
   await json(receiptPath, receipt);
   const filePath = join(workspaceRoot, 'download.mp4');
@@ -88,4 +88,52 @@ test('import refuses mismatched receipt, nonvideo and tampered frozen plan', asy
   plan.shots[0].events[0].text = 'Changed';
   await json(path, plan);
   await assert.rejects(importBrowserTake(f, media), /unchanged frozen/);
+});
+
+const FLOW_URL = 'https://flow.google.com/project/00000000-0000-0000-0000-000000000000';
+
+test('flow route composes a browser request bound to Flow, not to an API model', async () => {
+  const f = await fixture('flow-browser', FLOW_URL);
+  const req = JSON.parse(await readFile(f.requestPath));
+  assert.equal(req.schema_version, 'browser-request/1');
+  assert.equal(req.provider, 'flow-browser');
+  assert.equal(req.model, 'flow-browser');
+  assert.equal(req.generate_audio, false);
+  assert.throws(() => normalizeVideoRequest(req));
+  const checked = shotPlanFindings({ plan: f.plan, continuity: f.continuity });
+  const preflight = checked.findings.find(x => x.code === 'browser_preflight_required');
+  assert.match(preflight.message, /Google Flow/);
+});
+
+test('flow import records the route and refuses a Gemini or download result URL', async () => {
+  const f = await fixture('flow-browser', FLOW_URL);
+  for (const url of ['https://gemini.google.com/app/test', 'https://storage.googleapis.com/signed.mp4']) {
+    await json(f.receiptPath, { ...f.receipt, result_url: url });
+    await assert.rejects(importBrowserTake(f, media), /Google Flow page/);
+  }
+  await json(f.receiptPath, { ...f.receipt, model_label: 'Omni 1.2' });
+  const result = await importBrowserTake(f, media);
+  assert.equal(result.provider, 'flow-browser');
+  assert.equal(result.model_label, 'Omni 1.2');
+});
+
+test('import refuses a request whose browser route differs from the frozen shot', async () => {
+  const f = await fixture('flow-browser', FLOW_URL);
+  const request = JSON.parse(await readFile(f.requestPath));
+  request.provider = 'gemini-browser';
+  await json(f.requestPath, request);
+  await json(f.receiptPath, { ...f.receipt, request_sha256: await hashFile(f.requestPath) });
+  await assert.rejects(importBrowserTake(f, media), /not routed to gemini-browser/);
+});
+
+test('flow plan warns when a shot exceeds the observed Flow controls', async () => {
+  const f = await fixture('flow-browser', FLOW_URL);
+  const ok = shotPlanFindings({ plan: { ...f.plan, target: { ...f.plan.target, resolution_default: '720p' } }, continuity: f.continuity });
+  assert.ok(!ok.findings.some(x => x.code === 'browser_ui_mismatch'));
+  const plan = { ...f.plan, target: { ...f.plan.target, resolution_default: '1080p' },
+    shots: f.plan.shots.map(s => ({ ...s, duration_seconds: 16 })) };
+  const warn = shotPlanFindings({ plan, continuity: f.continuity }).findings.find(x => x.code === 'browser_ui_mismatch');
+  assert.equal(warn.level, 'warning');
+  assert.match(warn.message, /1080p/);
+  assert.match(warn.message, /16s/);
 });

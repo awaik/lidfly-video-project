@@ -6,6 +6,7 @@ import { continuityHash, createContinuity, normalizeContinuity } from "../domain
 import { productionMetadata } from "../domain/production-context.mjs";
 import { shotPlanFindings } from "../domain/shot-plan-checks.mjs";
 import { composeShotPrompt } from "../domain/shot-prompt.mjs";
+import { isBrowserRoute } from "../domain/browser-routes.mjs";
 import {
   aspectRatioForShot,
   createShotPlan,
@@ -316,7 +317,8 @@ export async function composeShotRequests({
 
   const requests = [];
   for (const shot of shots) {
-    if (shot.route.model === "gemini-browser" && !/^B[1-9]\d*$/.test(takeId)) {
+    const browser = isBrowserRoute(shot.route.model);
+    if (browser && !/^B[1-9]\d*$/.test(takeId)) {
       throw new Error("Browser shots require --take-id B1, B2, ...");
     }
     const { prompt, blocks } = composeShotPrompt({ plan, continuity, shot });
@@ -328,21 +330,21 @@ export async function composeShotRequests({
         role: "identity",
         path: join(project.registryRoot, asset.path),
         rights_status: asset.rights_status,
-        ...(shot.route.model === "gemini-browser" ? { sha256: asset.sha256 } : {}),
+        ...(browser ? { sha256: asset.sha256 } : {}),
       };
     });
     const request = {
-      schema_version: shot.route.model === "gemini-browser" ? "browser-request/1" : 1,
+      schema_version: browser ? "browser-request/1" : 1,
       shot_id: shot.shot_id,
       take_id: takeId,
-      provider: shot.route.model === "gemini-browser" ? "gemini-browser" : "evolink",
+      provider: browser ? shot.route.model : "evolink",
       model: shot.route.model,
       mode: shot.route.mode,
       prompt,
       duration_seconds: shot.duration_seconds,
       aspect_ratio: aspectRatioForShot(plan.target, shot.route),
       resolution: plan.target.resolution_default,
-      generate_audio: shot.route.model === "gemini-browser" ? false : (plan.target.generate_audio ?? true),
+      generate_audio: browser ? false : (plan.target.generate_audio ?? true),
       references,
       options: {},
       metadata: {

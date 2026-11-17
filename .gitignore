@@ -12,6 +12,8 @@ node_modules/
 /projects/
 /audio-library/
 /characters/
+# Generated local catalog of the projects above (`node src/cli.mjs catalog`).
+/projects.md
 
 # Logs in any directory.
 *.log
